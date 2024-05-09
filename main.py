@@ -1,14 +1,18 @@
 import random
 import os
 
-n = 10
-mines = 15
+n = 9
+mines = 10
 debug = False
 board = None
 numbers = None
 MINE = -1
 mask = None
 flags = None
+
+hide = False
+
+
 
 def make_mask():
     global mask
@@ -118,7 +122,6 @@ def get_character(num):
 
 i_player = 0
 j_player = 0
-hide = False
 
 def move_player(i,j):
     global i_player, j_player
@@ -171,37 +174,52 @@ def render():
         s+="\n"
     print(s)
 
-def check_win(i,j):
+def check_loss(i,j):
     if get_board(i,j) == MINE:
         return True
     return False
 
-os.system('cls' if os.name == 'nt' else 'clear')
+def check_win():
+    for i in range(n):
+        for j in range(n):
+            if get_mask(i,j) == 0 and get_board(i,j)!=MINE:
+                return False
+    return True
 
-while True:
-    
-    render()
-    inp = input()
+def cls():
     os.system('cls' if os.name == 'nt' else 'clear')
-    if inp == 'w':
-        move_player(i_player-1,j_player)
-    if inp == 's':
-        move_player(i_player+1,j_player)
-    if inp == 'a':
-        move_player(i_player,j_player-1)
-    if inp == 'd':
-        move_player(i_player,j_player+1)
-    if inp == 'h':
-        hide = not hide
-    if inp == 'q':
-        break
-    if inp == 'f' and get_mask(i_player,j_player) == 0:
-        try:
-            flags[i_player][j_player] += 1
-        except:
-            pass
-    if inp == 'j':
-        if check_win(i_player,j_player):
-            print("GAME OVER")
+
+def main():
+    global hide
+    cls()
+    while True:
+        render()
+        inp = input()
+        cls()
+        if inp == 'w':
+            move_player(i_player-1,j_player)
+        if inp == 's':
+            move_player(i_player+1,j_player)
+        if inp == 'a':
+            move_player(i_player,j_player-1)
+        if inp == 'd':
+            move_player(i_player,j_player+1)
+        if inp == 'h':
+            hide = not hide
+        if inp == 'q':
             break
-        explode(i_player, j_player)
+        if inp == 'f' and get_mask(i_player,j_player) == 0:
+            try:
+                flags[i_player][j_player] += 1
+            except:
+                pass
+        if inp == 'j':
+            if check_loss(i_player,j_player):
+                print("GAME OVER")
+                break
+            explode(i_player, j_player)
+        if check_win():
+            print("VICTORY")
+            break
+
+main()
